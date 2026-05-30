@@ -1,3 +1,5 @@
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import Database from "better-sqlite3";
 import logger from "../config/logger.js";
 import { env } from "../config/env.js";
@@ -10,6 +12,7 @@ export function getDatabase(): Database.Database {
   if (db) return db;
 
   try {
+    mkdirSync(dirname(DB_PATH), { recursive: true });
     db = new Database(DB_PATH);
     db.pragma("journal_mode = WAL");
     db.pragma("foreign_keys = ON");
