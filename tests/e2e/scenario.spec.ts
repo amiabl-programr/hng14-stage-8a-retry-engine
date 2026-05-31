@@ -64,13 +64,13 @@ describe("end-to-end: submit, retry, complete", () => {
     // Tick 2
     const row2 = getRequest(id);
     const { updateRequestStatus } = await import("../../src/db/requests.js");
-    updateRequestStatus(id, { nextRetryAt: 0 });
+    updateRequestStatus(id, { nextRetryAt: new Date(0).toISOString() });
     await executeRequest(row2!);
     await verify("retrying", 2);
 
     // Tick 3: final attempt succeeds
     const row3 = getRequest(id);
-    updateRequestStatus(id, { nextRetryAt: 0 });
+    updateRequestStatus(id, { nextRetryAt: new Date(0).toISOString() });
     await executeRequest(row3!);
     await verify("completed", 3);
 
@@ -92,7 +92,7 @@ describe("end-to-end: submit, retry, complete", () => {
 
     for (let i = 0; i < 3; i++) {
       const row = getRequest(id);
-      updateRequestStatus(id, { nextRetryAt: 0 });
+      updateRequestStatus(id, { nextRetryAt: new Date(0).toISOString() });
       await executeRequest(row!);
     }
 

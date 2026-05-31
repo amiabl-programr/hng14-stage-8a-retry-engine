@@ -20,11 +20,11 @@ export interface RequestRow {
   attemptCount: number;
   maxRetries: number;
   backoffMs: number;
-  nextRetryAt: number;
+  nextRetryAt: string;
   lastError: string | null;
   result: string | null;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AttemptRow {
@@ -34,7 +34,7 @@ export interface AttemptRow {
   statusCode: number | null;
   error: string | null;
   delay: number;
-  timestamp: number;
+  timestamp: string;
 }
 
 export interface CreateRequestPayload {

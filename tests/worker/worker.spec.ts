@@ -34,7 +34,7 @@ describe("startWorker / stopWorker", () => {
   it("processes due requests", async () => {
     insertRequest({ url: "https://httpbin.org/get", method: "GET", maxRetries: 1 });
 
-    const due = getDueRequests(Date.now() + 10000);
+    const due = getDueRequests(new Date(Date.now() + 10000).toISOString());
     expect(due).toHaveLength(1);
   });
 });

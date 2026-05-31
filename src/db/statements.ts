@@ -56,11 +56,11 @@ export const SCHEMA_SQL = `
     attemptCount INTEGER NOT NULL DEFAULT 0,
     maxRetries  INTEGER NOT NULL DEFAULT 5,
     backoffMs   INTEGER NOT NULL DEFAULT 1000,
-    nextRetryAt INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
+    nextRetryAt TEXT NOT NULL DEFAULT (datetime('now')),
     lastError   TEXT,
     result      TEXT,
-    createdAt   INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
-    updatedAt   INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
+    createdAt   TEXT NOT NULL DEFAULT (datetime('now')),
+    updatedAt   TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
   CREATE TABLE IF NOT EXISTS attempts (
@@ -70,7 +70,7 @@ export const SCHEMA_SQL = `
     statusCode    INTEGER,
     error         TEXT,
     delay         INTEGER NOT NULL,
-    timestamp     INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
+    timestamp     TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
   CREATE INDEX IF NOT EXISTS idx_requests_status_nextRetryAt

@@ -2,7 +2,7 @@ import type { AttemptRow } from "../common/types.js";
 import { getStatements } from "./statements.js";
 
 export function insertAttempt(attempt: Omit<AttemptRow, "id" | "timestamp">): void {
-  const now = Date.now();
+  const now = new Date().toISOString();
   getStatements().insertAttempt.run(
     attempt.requestId,
     attempt.attemptNumber,
