@@ -64,8 +64,17 @@ async function executeAttempt(
   }
 }
 
+const LOCK_DURATION_MS = 30_000;
+
 export async function executeRequest(row: RequestRow): Promise<void> {
   const attemptNumber = row.attemptCount + 1;
+
+  updateRequestStatus(row.id, {
+    status: REQUEST_STATUS.RETRYING,
+    attemptCount: attemptNumber,
+    nextRetryAt: new Date(Date.now() + LOCK_DURATION_MS).toISOString(),
+  });
+
   const result = await executeAttempt(row);
 
   if (result.success) {
@@ -117,7 +126,7 @@ export async function executeRequest(row: RequestRow): Promise<void> {
   }
 
   const delay = computeDelay(attemptNumber, row.backoffMs);
-  const nextRetryAt = Date.now() + delay;
+  const nextRetryAt = new Date(Date.now() + delay).toISOString();
 
   insertAttempt({
     requestId: row.id,

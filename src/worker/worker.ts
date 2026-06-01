@@ -13,7 +13,7 @@ export function startWorker(): void {
 
   intervalId = setInterval(async () => {
     try {
-      const now = Date.now();
+      const now = new Date().toISOString();
       const rows = getDueRequests(now);
 
       if (rows.length === 0) return;
