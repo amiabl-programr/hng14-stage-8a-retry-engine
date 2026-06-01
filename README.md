@@ -187,29 +187,46 @@ Poll `GET /requests/<id>` — status becomes `failed` after 2 attempts, `"lastEr
 
 ## Core Concepts
 
-[PLACEHOLDER: Explain why exponential backoff and jitter matter, and why some errors (5xx, timeouts, network) should be retried while others (4xx) shouldn't.]
+**Exponential backoff** increases the delay between retries exponentially (e.g., 1s → 2s → 4s), preventing rapid repeated failures from overwhelming the server. **Jitter** adds randomness to each delay, avoiding the *thundering herd* problem where many clients retry simultaneously at the same interval.
+
+**Retriable errors** — 5xx (server errors), timeouts, and network failures — are transient and may succeed on retry since the fault lies with the server or network, not the request itself.
+
+**Non-retriable errors** — 4xx like 400, 401, 404, 422 — are client errors and will always fail the same way regardless of retries, so retrying them wastes resources.
 
 ## Screenshot
 
-[PLACEHOLDER: Screenshot of `GET /requests/:id` showing attempt history of a request that failed a few times and eventually succeeded.]
+Screenshot of `GET /requests/:id` showing attempt history of a request that failed a few times and eventually succeeded.
+
+![Image](/public/req_id.png)
 
 ## What I Struggled With
 
-[PLACEHOLDER: Bugs you hit, things that didn't work the first time, moments you were stuck.]
+**Bug — Worker running a single request 3 times.**
+
+The worker ticked every 500ms, but `executeRequest` awaited the HTTP call (~1–2s) before updating the DB. The next tick re-fetched the row (still `pending`) and fired another `executeRequest`.
+
+**Fix:** The executor now claims the row synchronously before the HTTP call — it sets `status = retrying`, increments `attemptCount`, and pushes `nextRetryAt` 30s into the future. This acts as a soft lock that `getDueRequests` respects (`nextRetryAt <= now` excludes it), so subsequent worker ticks skip it.
+
+**Alternative considered:** Adding a `processing` status to the other 4 enums, but that adds an extra DB trip per request and may cause performance issues.
 
 ## What I Learned
 
-[PLACEHOLDER: Concepts, patterns, language/framework features, or debugging techniques that were new to you.]
+The whole concept of a retry engine was new to me — I've seen it in apps but never dug into why such a feature exists. I also discovered httpbin.org, which is a really handy tool for testing HTTP interactions. Building a mock server that fails twice then succeeds on the third attempt taught me a clean testing pattern I wouldn't have thought of on my own. I was also introduced to **nock** for HTTP server mocking.
 
 ## Resources
 
-[PLACEHOLDER: Articles, docs, Stack Overflow threads, AI prompts, videos — anything that helped. Link them.]
+- [Exponential Backoff and Jitter Article](https://theshubhendra.medium.com/exponential-backoff-with-jitter-because-everyone-cant-call-at-once-10f4ef238f1f)
+- [httpbin.org](https://httpbin.org) — HTTP request & response testing service
+- [nock](https://github.com/nock/nock) — HTTP server mocking for Node.js
+- [Exponential Backoff and Jitter (AWS Architecture Blog)](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/) — explains why jitter matters in distributed systems
+- [Node.js Promises](https://nodejs.org/learn/asynchronous-work/discover-promises-in-nodejs#promise-based-nodejs-apis) — understanding asynchronous work
+
 
 ## Why This Made Me a Better Backend Developer
 
-[PLACEHOLDER: Be specific. What can you do now that you couldn't before? Which production scenarios will you think about differently?]
+Now, I'll make sure to include a retry engine for external API calls like Google OAuth integration, MCP integration, and others. I can see this being useful when using Cloudinary for image upload/retrieval or video streaming.
 
 ## Demo Video
 
-[PLACEHOLDER: Link to your 30-second demo video (YouTube unlisted, Google Drive, or Loom). Show: (1) request that fails a few times then succeeds with visible doubling backoff, (2) 4xx case not retried, (3) request that hits maxRetries and is dead-lettered.]
+https://drive.google.com/file/d/1vFOZZYBpllU2gZDO5eKW61V2cXhamhLD/view?usp=drive_link
 
