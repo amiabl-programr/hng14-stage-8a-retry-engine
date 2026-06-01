@@ -31,8 +31,8 @@ function prepareStatements(database: Database.Database): PreparedStatements {
        ORDER BY nextRetryAt ASC`,
     ),
     insertAttempt: database.prepare(`
-      INSERT INTO attempts (requestId, attemptNumber, statusCode, error, delay, timestamp)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO attempts (id, requestId, attemptNumber, statusCode, error, delay, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `),
     getAttemptsByRequestId: database.prepare(
       "SELECT * FROM attempts WHERE requestId = ? ORDER BY attemptNumber ASC",
@@ -64,7 +64,7 @@ export const SCHEMA_SQL = `
   );
 
   CREATE TABLE IF NOT EXISTS attempts (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    id            TEXT PRIMARY KEY,
     requestId     TEXT NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
     attemptNumber INTEGER NOT NULL,
     statusCode    INTEGER,

@@ -28,7 +28,7 @@ export interface RequestRow {
 }
 
 export interface AttemptRow {
-  id: number;
+  id: string;
   requestId: string;
   attemptNumber: number;
   statusCode: number | null;
