@@ -5,7 +5,7 @@ import { getStatements, buildUpdateStatement } from "./statements.js";
 
 export function insertRequest(payload: CreateRequestPayload): RequestRow {
   const id = uuidv4();
-  const now = Date.now();
+  const now = new Date().toISOString();
   const maxRetries = payload.maxRetries ?? 5;
   const backoffMs = payload.backoffMs ?? 1000;
   const body = payload.body !== undefined ? JSON.stringify(payload.body) : null;
@@ -42,12 +42,12 @@ export function updateRequestStatus(
   updates: Partial<{
     status: string;
     attemptCount: number;
-    nextRetryAt: number;
+    nextRetryAt: string;
     lastError: string | null;
     result: string | null;
   }>,
 ): void {
-  const now = Date.now();
+  const now = new Date().toISOString();
   const fields: string[] = ["updatedAt"];
   const values: unknown[] = [now];
 
@@ -76,7 +76,7 @@ export function updateRequestStatus(
   buildUpdateStatement(fields).run(...values);
 }
 
-export function getDueRequests(now: number): RequestRow[] {
+export function getDueRequests(now: string): RequestRow[] {
   return getStatements().getDueRequests.all(
     REQUEST_STATUS.PENDING,
     REQUEST_STATUS.RETRYING,

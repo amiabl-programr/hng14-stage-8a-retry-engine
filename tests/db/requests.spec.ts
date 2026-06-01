@@ -88,17 +88,17 @@ describe("listRequests", () => {
 describe("getDueRequests", () => {
   it("returns pending requests with past nextRetryAt", () => {
     insertRequest({ url: "https://a.com", method: "GET" });
-    const due = getDueRequests(Date.now() + 10000);
+    const due = getDueRequests(new Date(Date.now() + 10000).toISOString());
     expect(due).toHaveLength(1);
   });
 
   it("excludes requests with future nextRetryAt", () => {
     const row = insertRequest({ url: "https://a.com", method: "GET" });
     updateRequestStatus(row.id, {
-      nextRetryAt: Date.now() + 60000,
+      nextRetryAt: new Date(Date.now() + 60000).toISOString(),
       status: REQUEST_STATUS.RETRYING,
     });
-    const due = getDueRequests(Date.now());
+    const due = getDueRequests(new Date().toISOString());
     expect(due).toHaveLength(0);
   });
 
@@ -108,11 +108,11 @@ describe("getDueRequests", () => {
     const r2 = insertRequest({ url: "https://b.com", method: "GET" });
 
     // Manually set nextRetryAt to specific orders
-    updateRequestStatus(r3.id, { nextRetryAt: 3000 });
-    updateRequestStatus(r1.id, { nextRetryAt: 1000 });
-    updateRequestStatus(r2.id, { nextRetryAt: 2000 });
+    updateRequestStatus(r3.id, { nextRetryAt: new Date(3000).toISOString() });
+    updateRequestStatus(r1.id, { nextRetryAt: new Date(1000).toISOString() });
+    updateRequestStatus(r2.id, { nextRetryAt: new Date(2000).toISOString() });
 
-    const due = getDueRequests(5000);
+    const due = getDueRequests(new Date(5000).toISOString());
     expect(due).toHaveLength(3);
     expect(due[0].id).toBe(r1.id);
     expect(due[1].id).toBe(r2.id);
@@ -122,9 +122,9 @@ describe("getDueRequests", () => {
   it("returns both pending and retrying requests that are due", () => {
     const pending = insertRequest({ url: "https://a.com", method: "GET" });
     const retrying = insertRequest({ url: "https://b.com", method: "POST" });
-    updateRequestStatus(retrying.id, { status: REQUEST_STATUS.RETRYING, nextRetryAt: 0 });
+    updateRequestStatus(retrying.id, { status: REQUEST_STATUS.RETRYING, nextRetryAt: new Date(0).toISOString() });
 
-    const due = getDueRequests(Date.now() + 10000);
+    const due = getDueRequests(new Date(Date.now() + 10000).toISOString());
     expect(due).toHaveLength(2);
   });
 });
