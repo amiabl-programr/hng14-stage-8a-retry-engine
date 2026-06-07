@@ -170,8 +170,6 @@ Poll `GET /requests/<id>` — status becomes `failed` after 2 attempts, `"lastEr
 
 ## Architecture
 
-[PLACEHOLDER: Architecture diagram of the retry flow — API → storage → worker → external service]
-
 ```
 ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
 │  Client  │ ──▶ │   API    │ ──▶ │ Storage  │ ◀── │  Worker  │

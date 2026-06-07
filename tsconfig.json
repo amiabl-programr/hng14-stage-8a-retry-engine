@@ -5,23 +5,25 @@
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
     "target": "ES2023",
-    "lib": ["ES2023"],
-    "types": ["node", "jest"],
+    "lib": [
+      "ES2023"
+    ],
+    "types": [
+      "node",
+      "jest"
+    ],
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "./src",
     "esModuleInterop": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-
     "declaration": true,
     "removeComments": true,
     "sourceMap": true,
     "skipLibCheck": true,
-
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
@@ -32,6 +34,12 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist", "coverage"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage"
+  ]
 }
